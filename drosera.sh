@@ -151,8 +151,10 @@ echo ""
 read -p "⏳ Press Enter once you've sent the Bloom Boost..."
 
 # 17. Run dryrun
+# 16. Run dryrun
 echo "📡 Running drosera dryrun..."
-drosera dryrun
+drosera dryrun -c ~/my-drosera-trap/drosera.toml
+
 
 # 18. Done
 echo ""
