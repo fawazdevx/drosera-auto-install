@@ -76,8 +76,8 @@ private_trap = true
 whitelist = ["'"$OP_ADDR"'"]' >> drosera.toml
 
 # 10. Delay and reapply
-echo "⏳ Waiting 5 minutes before re-applying config with whitelist..."
-sleep 300
+echo "⏳ Waiting 10 minutes before re-applying config with whitelist..."
+sleep 600
 
 echo "Re-applying trap config with whitelist..."
 DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc" | tee "$LOG_FILE"
