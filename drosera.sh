@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Check if drosera_operator exists and remove it
+if [ -d "drosera_operator" ]; then
+  echo "Removing drosera_operator directory..."
+  rm -rf "drosera_operator"
+fi
+
+# Check if my_trap_drosera exists and remove it
+if [ -d "my_trap_drosera" ]; then
+  echo "Removing my_trap_drosera directory..."
+  rm -rf "my_trap_drosera"
+fi
+
 echo "🌿 Hella One Click"
 echo "🚀 Drosera Full Auto Install (SystemD Only)"
 
