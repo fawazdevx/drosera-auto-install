@@ -9,7 +9,7 @@ fi
 # Check if my_trap_drosera exists and remove it
 if [ -d "my_trap_drosera" ]; then
   echo "Removing my_trap_drosera directory..."
-  rm -rf "my_trap_drosera"
+  rm -rf "my_drosera_trap"
 fi
 
 echo "🌿 Hella One Click"
@@ -135,5 +135,5 @@ drosera dryrun
 # === 17. Done ===
 echo ""
 echo "✅ Setup complete."
-echo "🪤 Trap: https://app.drosera.io/trap?trapId=$TRAP_ADDR"
+echo "🪤 Trap: https://app.drosera.io/trap?trapId=$(echo $TRAP_ADDR | tr '[:upper:]' '[:lower:]')"
 echo "📖 Logs: journalctl -u drosera -f"
