@@ -87,7 +87,7 @@ tar -xvf drosera-operator-v1.16.2-x86_64-unknown-linux-gnu.tar.gz
 sudo cp drosera-operator /usr/bin && chmod +x /usr/bin/drosera-operator
 
 # === 11. Register Operator ===
-drosera-operator register --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com --eth-private-key $PK
+drosera-operator register --eth-rpc-url https://holesky.drpc.org --eth-private-key $PK
 
 # === 12. Setup SystemD ===
 echo "🛠️ Setting up systemd service..."
