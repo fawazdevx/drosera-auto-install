@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 echo "hella one click"
@@ -46,9 +45,21 @@ forge build
 
 # 8. Deploy Trap (1st apply)
 echo "Deploying trap to Holesky, your wallet need balance of holesky eth buddy"
-DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc"
+LOG_FILE="/tmp/drosera_deploy.log"
+DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc" | tee "$LOG_FILE"
 
-# 9. Edit drosera.toml to whitelist operator
+# Extract trap address from log
+TRAP_ADDR=$(grep -oP '(?<=address: 0x)[a-fA-F0-9]{40}' "$LOG_FILE" | head -n 1)
+TRAP_ADDR="0x$TRAP_ADDR"
+
+if [[ -z "$TRAP_ADDR" || "$TRAP_ADDR" == "0x" ]]; then
+  echo "❌ Failed to detect trap address from terminal output."
+  exit 1
+fi
+
+echo "🕳️ Trap created at: $TRAP_ADDR"
+
+# 9. Add whitelist if not present
 echo "Whitelisting operator..."
 cd ~/my-drosera-trap
 read -p "📬 Enter the PUBLIC address linked to your used private key (starts with 0x): " OP_ADDR
@@ -57,11 +68,24 @@ if [[ -z "$OP_ADDR" ]]; then
   echo "❌ Public address is required to whitelist operator."
   exit 1
 fi
-echo -e '\nprivate_trap = true\nwhitelist = ["'"$OP_ADDR"'"]' >> drosera.toml
 
-# 10. Deploy Trap again (2nd apply)
+# Remove duplicate whitelist keys if exist
+sed -i '/^whitelist/d' drosera.toml
+echo -e '
+private_trap = true
+whitelist = ["'"$OP_ADDR"'"]' >> drosera.toml
+
+# 10. Delay and reapply
+echo "⏳ Waiting 5 minutes before re-applying config with whitelist..."
+sleep 300
+
 echo "Re-applying trap config with whitelist..."
-DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc"
+DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc" | tee "$LOG_FILE"
+
+# Check for duplicate key error
+if grep -q "duplicate key: whitelist" "$LOG_FILE"; then
+  echo "⚠️ Already whitelisted. Continuing anyway..."
+fi
 
 # 11. Download operator binary
 cd ~
@@ -80,7 +104,6 @@ sudo ufw disable
 # 14. Create systemd service
 echo "Setting up systemd service..."
 
-# Check if the user is root or not
 CURRENT_USER=$(whoami)
 if [ "$CURRENT_USER" != "root" ]; then
   USER=$CURRENT_USER
@@ -88,7 +111,6 @@ else
   USER="root"
 fi
 
-# Use the username dynamically instead of hardcoding root
 sudo tee /etc/systemd/system/drosera.service > /dev/null <<EOF
 [Unit]
 Description=drosera node service
@@ -117,18 +139,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable drosera
 sudo systemctl start drosera
 
-# ⚠️ Trap must be deployed at this point!
-
-# Parse deployed trap address from drosera apply log
-TRAP_ADDR=$(cat ~/.drosera/deployments.json | jq -r '.[0].trapAddress')
-
-if [[ -z "$TRAP_ADDR" || "$TRAP_ADDR" == "null" ]]; then
-  echo "❌ Could not auto-detect trap address. Please check manually in the Drosera dashboard."
-  exit 1
-fi
-
+# 16. Bloom Boost
 BLOOM_URL="https://app.drosera.io/trap?trapId=$TRAP_ADDR"
-
 echo ""
 echo "🌱 Your trap has been deployed at: $TRAP_ADDR"
 echo "💸 You MUST send Bloom Boost to it before continuing."
@@ -138,11 +150,11 @@ echo "👉 $BLOOM_URL"
 echo ""
 read -p "⏳ Press Enter once you've sent the Bloom Boost..."
 
-# 16. Run dryrun
+# 17. Run dryrun
 echo "📡 Running drosera dryrun..."
 drosera dryrun
 
-# 17. Done
+# 18. Done
 echo ""
 echo "✅ All done. Node running via systemd."
 echo "💻 Logs: journalctl -u drosera -f"
