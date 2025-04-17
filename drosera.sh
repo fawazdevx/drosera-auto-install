@@ -122,7 +122,7 @@ sudo systemctl start drosera
 
 # === 14. Bloom Boost ===
 echo "⚡ Sending Bloom Boost to trap: $TRAP_ADDR"
-DROSERA_PRIVATE_KEY=$PK drosera bloomboost --trap-id $TRAP_ADDR --eth-amount 0.01
+DROSERA_PRIVATE_KEY=$PK drosera bloomboost --trap-address $TRAP_ADDR --eth-amount 0.01
 
 # === 15. Opt-in ===
 echo "🔗 Opting in operator to trap..."
