@@ -5,7 +5,7 @@ if [ -d "drosera_operator" ]; then
   echo "Removing drosera_operator directory..."
   rm -rf "drosera_operator"
 fi
-
+rm -rf ".drosera"
 # Check if my_trap_drosera exists and remove it
 if [ -d "my_drosera_trap" ]; then
   echo "Removing my_drosera_trap directory..."
