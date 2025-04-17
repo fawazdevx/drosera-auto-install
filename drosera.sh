@@ -78,17 +78,27 @@ sudo ufw disable
 
 # 14. Create systemd service
 echo "Setting up systemd service..."
+
+# Check if the user is root or not
+CURRENT_USER=$(whoami)
+if [ "$CURRENT_USER" != "root" ]; then
+  USER=$CURRENT_USER
+else
+  USER="root"
+fi
+
+# Use the username dynamically instead of hardcoding root
 sudo tee /etc/systemd/system/drosera.service > /dev/null <<EOF
 [Unit]
 Description=drosera node service
 After=network-online.target
 
 [Service]
-User=root
+User=$USER
 Restart=always
 RestartSec=15
 LimitNOFILE=65535
-ExecStart=/usr/bin/drosera-operator node --db-file-path /root/.drosera.db --network-p2p-port 31313 --server-port 31314 \\
+ExecStart=/usr/bin/drosera-operator node --db-file-path /home/$USER/.drosera.db --network-p2p-port 31313 --server-port 31314 \\
     --eth-rpc-url https://ethereum-holesky-rpc.publicnode.com \\
     --eth-backup-rpc-url https://1rpc.io/holesky \\
     --drosera-address 0xea08f7d533C2b9A62F40D5326214f39a8E3A32F8 \\
@@ -126,7 +136,6 @@ echo ""
 echo "👉 $BLOOM_URL"
 echo ""
 read -p "⏳ Press Enter once you've sent the Bloom Boost..."
-
 
 # 16. Run dryrun
 echo "📡 Running drosera dryrun..."
