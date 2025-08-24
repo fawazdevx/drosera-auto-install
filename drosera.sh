@@ -69,7 +69,7 @@ echo "🚀 Deploying trap to Holesky..."
 LOG_FILE="/tmp/drosera_deploy.log"
 DROSERA_PRIVATE_KEY=$PK drosera apply <<< "ofc" | tee "$LOG_FILE"
 
-TRAP_ADDR=$(grep -oP '(?<=address: 0x)[a-fA-F0-9]{40}' "$LOG_FILE" | head -n 1)
+TRAP_ADDR=$(grep -oP '(?<=address: 0x7C94Ad3842734a5a418d71A975445c74e24FEBea)[a-fA-F0-9]{40}' "$LOG_FILE" | head -n 1)
 TRAP_ADDR="0x$TRAP_ADDR"
 
 if [[ -z "$TRAP_ADDR" || "$TRAP_ADDR" == "0x" ]]; then
